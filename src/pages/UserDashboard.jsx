@@ -14,16 +14,16 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('token');
+        
         const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user/profile`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
           withCredentials: true,
         });
         setProfile(res.data);
+        setLoading(false)
       } catch (err) {
         console.error(err);
         if (err.response && err.response.status === 401) {
-          localStorage.removeItem('token');
+          
           setAuthUser(null);
           navigate('/login');
         }
@@ -42,7 +42,6 @@ const UserDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/user/profile`, profile, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
         withCredentials: true,
       });
       alert('Profile updated!');
@@ -56,7 +55,6 @@ const UserDashboard = () => {
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
-      localStorage.removeItem('token');
       setAuthUser(null);
       navigate('/login');
     } catch (err) {
@@ -66,8 +64,19 @@ const UserDashboard = () => {
 
   const isProfileComplete = profile.name && profile.phone && profile.dob;
 
+  const handleSkip = () => {
+    if (isProfileComplete) {
+      navigate('/user/dashboard/main');
+    } else {
+      alert('Please complete your profile before skipping.');
+    }
+  };
+
   if (loading) {
-    return <p className="center-text">Loading...</p>;
+    return(<div className="loading-container">
+      <div className="spinner"></div>
+      <p>Loading...</p>
+    </div>);
   }
 
   return (
@@ -83,6 +92,7 @@ const UserDashboard = () => {
           <p><strong>Phone:</strong> {profile.phone}</p>
           <p><strong>Date of Birth:</strong> {profile.dob}</p>
           <button onClick={() => setEditMode(true)} className="btn edit-btn">Edit Profile</button>
+          <button onClick={handleSkip} className="skip-btn">Skip</button>
         </div>
       ) : (
         <form onSubmit={handleUpdate} className="profile-form">

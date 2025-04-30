@@ -33,6 +33,7 @@ const FarmerDashboard = () => {
 
     fetchProfile();
   }, [navigate, setAuthUser]);
+  
 
   const handleChange = (e) => setProfile({ ...profile, [e.target.name]: e.target.value });
 
@@ -46,20 +47,28 @@ const FarmerDashboard = () => {
       setEditMode(false);
     } catch (err) {
       alert('Update failed');
-    }
+    } 
   };
 
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
       setAuthUser(null); // Clear user context
-      navigate('/login'); // Redirect to login page
+      navigate('/'); // Redirect to login page
     } catch (err) {
       console.error(err);
     }
   };
 
   const isProfileComplete = profile.name && profile.zone && profile.area;
+
+  const handleSkip = () => {
+    if (isProfileComplete) {
+      navigate('/farmer/dashboard/main');
+    } else {
+      alert('Please complete your profile before skipping.');
+    }
+  };
 
   if (loading) {
     return (
@@ -85,7 +94,10 @@ const FarmerDashboard = () => {
           <p><strong>Zone:</strong> {profile.zone}</p>
           <p><strong>Area:</strong> {profile.area}</p>
           <button onClick={() => setEditMode(true)} className="edit-btn">Edit Profile</button>
+          <button onClick={handleSkip} className="skip-btn">Skip</button>
         </div>
+        
+        
       ) : (
         <form onSubmit={handleUpdate} className="profile-form">
           <input
@@ -109,7 +121,7 @@ const FarmerDashboard = () => {
             onChange={handleChange}
             placeholder="Area"
           />
-          <button className="submit-btn">{isProfileComplete ? 'Save Changes' : 'Create Profile'}</button>
+          <button onClick={handleUpdate} className="submit-btn">{isProfileComplete ? 'Save Changes' : 'Create Profile'}</button>
         </form>
       )}
     </div>

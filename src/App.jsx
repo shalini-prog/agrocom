@@ -4,9 +4,11 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import UserDashboard from "./pages/UserDashboard";
 import FarmerDashboard from "./pages/FarmerDashboard";
+import FarmerMain from "./pages/Farmer/FarmerMain"; // <-- Import new page
 import AdminDashboard from "./pages/AdminDashboard";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import CustomerMain from "./pages/Customer/CustomerMain";
 
 const App = () => {
   return (
@@ -16,17 +18,53 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          
           <Route
             path="/user-dashboard"
-            element={<ProtectedRoute role="user"><UserDashboard /></ProtectedRoute>}
+            element={
+              <ProtectedRoute role="user">
+                <UserDashboard />
+              </ProtectedRoute>
+            }
           />
+
+          <Route
+            path="/user/dashboard/main"
+            element={
+              <ProtectedRoute role="user">
+                <CustomerMain />
+              </ProtectedRoute>
+            }
+          />
+          
           <Route
             path="/farmer-dashboard"
-            element={<ProtectedRoute role="farmer"><FarmerDashboard /></ProtectedRoute>}
+            element={
+              <ProtectedRoute role="farmer">
+                <FarmerDashboard />
+              </ProtectedRoute>
+            }
           />
+
+          {/* 🔥 New route for farmer's main dashboard */}
+          <Route
+            path="/farmer/dashboard/main"
+            element={
+              <ProtectedRoute role="farmer">
+                <FarmerMain />
+              </ProtectedRoute>
+            }
+          />
+          
+          
+
           <Route
             path="/admin-dashboard"
-            element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>}
+            element={
+              <ProtectedRoute role="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </AuthProvider>

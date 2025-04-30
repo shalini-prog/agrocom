@@ -1,16 +1,26 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import './ProtectedRoute.css'
 
 const ProtectedRoute = ({ children, role }) => {
   const { authUser, loading } = useAuth(); // 👈 access loading
 
+  
   if (loading) {
-    return <div className="flex justify-center items-center min-h-screen text-lg">Loading...</div>;
+    console.log("Loading user...");
+      return <div className="loading-screen">Loading...</div>;
   }
+    
+  
 
-  if (!authUser) return <Navigate to="/login" />;
-  if (authUser.role !== role && authUser.role !== "admin") return <Navigate to="/" />;
-
+  if (!authUser) {
+    console.log("User not authenticated.");
+    return <Navigate to="/" replace/>
+  };
+  if (authUser.role !== role && authUser.role !== "admin"){
+    console.log("User role unauthorized:", authUser.role); 
+    return <Navigate to="/"  replace/>;
+  }
   return children;
 };
 
