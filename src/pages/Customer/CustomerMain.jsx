@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import './CustomerMain.css'
+import CustomerProducts from './Product';
+import CustomerOrders from './Orders';
+import CustomerCart from './Cart';
+import CustomerReviews from './Reviews';
 
 
 const CustomerMainDashboard = () => {
@@ -27,24 +31,24 @@ const CustomerMainDashboard = () => {
       case 'home':
         return (
           <div className="home-content">
-            <h2 className="content-title">Welcome to your Farmer Dashboard!</h2>
+            <h2 className="content-title">Welcome to your Customer Dashboard!</h2>
             <ul className="tips-list">
-              <li>🌱 Rotate your crops to keep soil healthy.</li>
-              <li>☀️ Monitor weather forecasts for better planning.</li>
-              <li>💧 Use drip irrigation to save water.</li>
-              <li>🐛 Use natural pesticides to protect crops.</li>
-              <li>📈 Keep records of your farming activities for improvements.</li>
+              <li>🛒 Browse and purchase fresh farm products directly from farmers.</li>
+              <li>📂 View and manage your orders easily in one place.</li>
+              <li>🛍️ Add products to your cart and place orders with just a few clicks.</li>
+              <li>❌ Cancel orders conveniently before they are processed.</li>
+              <li>⭐ Leave reviews and feedback to help others and support farmers.</li>
             </ul>
           </div>
         );
       case 'products':
-        return <h2 className="content-title">Products</h2>;
+        return <CustomerProducts/>
       case 'cart':
-        return <h2 className="content-title">Cart</h2>;
+        return <  CustomerCart/>
       case 'orders':
-        return <h2 className="content-title">Your Orders</h2>;
+        return <CustomerOrders/>
       case 'review':
-        return <h2 className="content-title">Product review</h2>;
+        return <CustomerReviews/>
       default:
         return <h2 className="content-title">Welcome!</h2>;
     }

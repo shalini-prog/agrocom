@@ -1,0 +1,46 @@
+.customer-reviews-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  .reviews-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .review-card {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 6px;
+  }
+  
+  .review-card h3 {
+    margin-top: 0;
+    font-size: 18px;
+  }
+  
+  .review-card p {
+    margin: 6px 0;
+  }
+  
+  .delete-button {
+    background-color: #d9534f;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .delete-button:hover {
+    background-color: #c9302c;
+  }
+  
