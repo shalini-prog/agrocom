@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import './AdminDashboard.css'; // Import the CSS
 
+
+
 const AdminDashboard = () => {
   const [profile, setProfile] = useState({ empType: '', empId: '', dept: '', phone: '', address: '' });
   const [loading, setLoading] = useState(true);
@@ -23,11 +25,11 @@ const AdminDashboard = () => {
         });
   
         setProfile(res.data);
-        setLoading(false)
+        setLoading(false);
       } catch (err) {
         console.error(err);
         if (err.response && err.response.status === 401) {
-          // Now redirect to login ONLY if server says unauthorized
+          // Redirect to login if unauthorized
           localStorage.removeItem('token');
           setAuthUser(null);
           navigate('/login');
@@ -39,7 +41,6 @@ const AdminDashboard = () => {
   
     fetchProfile();
   }, [navigate, setAuthUser]);
-  
 
   const handleChange = (e) => setProfile({ ...profile, [e.target.name]: e.target.value });
 
@@ -48,7 +49,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/admin/profile`, profile, {
-        headers: { Authorization: `Bearer ${token}` }, // Send token in headers
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       alert('Profile updated!');
@@ -61,9 +62,9 @@ const AdminDashboard = () => {
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
-      localStorage.removeItem('token'); // Remove token from localStorage on logout
-      setAuthUser(null); // Clear user from the context
-      navigate('/login'); // Redirect to login page
+      localStorage.removeItem('token');
+      setAuthUser(null);
+      navigate('/login');
     } catch (err) {
       console.error(err);
     }
@@ -90,7 +91,8 @@ const AdminDashboard = () => {
         <button onClick={handleLogout} className="btn logout-btn">Logout</button>
       </div>
 
-      {isProfileComplete && !editMode ? (
+      {/* Profile View or Edit Mode */}
+      {!editMode && isProfileComplete ? (
         <div className="profile-view">
           <p><strong>Employee Type:</strong> {profile.empType}</p>
           <p><strong>Employee ID:</strong> {profile.empId}</p>
@@ -113,5 +115,3 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
-export default AdminDashboard;
