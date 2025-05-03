@@ -92,9 +92,8 @@ const UserDashboard = () => {
           <p><strong>Phone:</strong> {profile.phone}</p>
           <p><strong>Date of Birth:</strong> {profile.dob}</p>
           <button onClick={() => setEditMode(true)} className="btn edit-btn">Edit Profile</button>
-          <div>
           <button onClick={handleSkip} className="skip-btn">Skip</button>
-            </div>
+
         </div>
       ) : (
         <form onSubmit={handleUpdate} className="profile-form">

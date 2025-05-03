@@ -6,6 +6,8 @@ import axios from 'axios';
 import './FarmerMain.css';
 import MyProducts from './Product';
 import FarmerOrders from './Orders';
+import FarmerNotifications from './Notification';
+import FarmerReviews from './Review';
 
 const FarmerMainDashboard = () => {
   const [activeTab, setActiveTab] = useState('home');
@@ -42,11 +44,11 @@ const FarmerMainDashboard = () => {
       case 'products':
         return <MyProducts/>
       case 'notifications':
-        return <h2 className="content-title">Notifications</h2>;
+        return <FarmerNotifications/>;
       case 'orders':
         return <FarmerOrders/>
       case 'review':
-        return <h2 className="content-title">Your Product review</h2>;
+        return <FarmerReviews/>
       default:
         return <h2 className="content-title">Welcome!</h2>;
     }

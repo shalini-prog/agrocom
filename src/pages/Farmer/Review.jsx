@@ -1,63 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import './CustomerReviews.css'; // Style this separately
+import './Review.css';
 
-const CustomerReviews = () => {
-  const [reviews, setReviews] = useState([]);
+const FarmerReviews = () => {
+  const [reviewsData, setReviewsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchFarmerReviews = async () => {
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/reviews/farmer`, {
+        withCredentials: true,
+      });
+      setReviewsData(res.data.reviews || []);
+    } catch (err) {
+      console.error('Error fetching reviews:', err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchReviews();
+    fetchFarmerReviews();
   }, []);
 
-  const fetchReviews = async () => {
-    try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/reviews/display/${userId}`, {
-        withCredentials: true,
-      });
-      setReviews(res.data.reviews || []);
-    } catch (err) {
-      console.error('Error fetching reviews:', err);
-      alert('Failed to fetch reviews.');
-    }
-  };
-
-  const handleDelete = async (reviewId) => {
-    try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/reviews/${reviewId}/review`, {
-        withCredentials: true,
-      });
-      alert('Review deleted successfully!');
-      setReviews((prev) => prev.filter((r) => r._id !== reviewId));
-    } catch (err) {
-      console.error('Error deleting review:', err);
-      alert('Failed to delete review.');
-    }
-  };
-
   return (
-    <div className="reviews-container">
-      <h2 className="reviews-title">Your Reviews</h2>
-      {reviews.length === 0 ? (
-        <p className="no-reviews">No reviews yet.</p>
+    <div className="farmer-reviews-container">
+      <h2>Product Reviews</h2>
+      {loading ? (
+        <p className="loading-text">Loading reviews...</p>
+      ) : reviewsData.length === 0 ? (
+        <p className="no-reviews-text">No reviews available.</p>
       ) : (
-        <div className="reviews-list">
-          {reviews.map((review) => (
-            <div key={review._id} className="review-card">
-              <h3 className="product-title">{review.product?.title || 'Unknown Product'}</h3>
-              <p><strong>Rating:</strong> {review.rating}/5</p>
-              <p><strong>Comment:</strong> {review.comment}</p>
-              <button
-                className="delete-button"
-                onClick={() => handleDelete(review._id)}
-              >
-                Delete Review
-              </button>
-            </div>
-          ))}
-        </div>
+        reviewsData.map((product) => (
+          <div key={product.productId} className="review-card">
+            <h3>{product.productTitle}</h3>
+            {product.reviews.length === 0 ? (
+              <p className="no-reviews-text">No reviews for this product.</p>
+            ) : (
+              product.reviews.map((review) => (
+                <div key={review._id} className="review-item">
+                  <p><strong>{review.customer?.name || 'Anonymous'}:</strong> {review.comment}</p>
+                  <p className="rating">Rating: ⭐ {review.rating}</p>
+                </div>
+              ))
+            )}
+          </div>
+        ))
       )}
     </div>
   );
 };
 
-export default CustomerReviews;
+export default FarmerReviews;

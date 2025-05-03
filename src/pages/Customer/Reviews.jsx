@@ -29,7 +29,7 @@ const CustomerReviews = () => {
 
   const handleDelete = async (reviewId) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/reviews/${reviewId}/review`, {
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/reviews/${reviewId}`, {
         withCredentials: true,
       });
       toast.success('Review deleted successfully!');

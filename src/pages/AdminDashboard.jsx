@@ -71,6 +71,14 @@ const AdminDashboard = () => {
 
   const isProfileComplete = profile.empType && profile.empId && profile.dept && profile.phone && profile.address;
 
+  const handleSkip = () => {
+    if (isProfileComplete) {
+      navigate('/admin/dashboard/main');
+    } else {
+      alert('Please complete your profile before skipping.');
+    }
+  };
+
   if (loading) {
     return <p className="center-text">Loading...</p>;
   }
@@ -90,6 +98,7 @@ const AdminDashboard = () => {
           <p><strong>Phone:</strong> {profile.phone}</p>
           <p><strong>Address:</strong> {profile.address}</p>
           <button onClick={() => setEditMode(true)} className="btn edit-btn">Edit Profile</button>
+          <button onClick={handleSkip} className="skip-btn">Skip</button>
         </div>
       ) : (
         <form onSubmit={handleUpdate} className="profile-form">

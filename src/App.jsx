@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import CustomerMain from "./pages/Customer/CustomerMain";
+import AdminMain from "./pages/Admin/AdminMain";
 
 const App = () => {
   return (
@@ -55,8 +56,15 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          
-          
+
+          <Route
+            path="/admin/dashboard/main"
+            element={
+              <ProtectedRoute role="farmer">
+                <AdminMain />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/admin-dashboard"
