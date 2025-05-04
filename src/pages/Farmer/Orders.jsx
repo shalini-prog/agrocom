@@ -48,7 +48,7 @@ const FarmerOrders = () => {
 
   const handleCancel = async (orderId) => {
     try {
-      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cancel/${orderId}`, {}, {
+      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/order/${orderId}/cancel-by-farmer`, {}, {
         withCredentials: true,
       });
       alert('Order cancelled!');

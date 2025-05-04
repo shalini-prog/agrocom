@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import './FarmerDashboard.css'; // Import the CSS
+import './FarmerDashboard.css';
 
 const FarmerDashboard = () => {
   const [profile, setProfile] = useState({ name: '', zone: '', area: '' });
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(true); // Start in form mode
+  const [profileCreated, setProfileCreated] = useState(false);
+
   const { setAuthUser } = useAuth();
   const navigate = useNavigate();
 
@@ -17,44 +19,49 @@ const FarmerDashboard = () => {
         const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/farmer/profile`, {
           withCredentials: true,
         });
-        setProfile(res.data);
-        setLoading(false)
+
+        if (res.data && res.data.name) {
+          setProfile(res.data);
+          setProfileCreated(true);
+          setEditMode(false);
+        }
       } catch (err) {
         console.error(err);
         if (err.response && err.response.status === 401) {
-          // Handle unauthorized access (e.g., expired token)
-          setAuthUser(null); // Clear auth context
-          navigate('/login'); // Redirect to login page
+          setAuthUser(null);
+          navigate('/login');
         }
       } finally {
-        setLoading(false); // Stop loading regardless of success or failure
+        setLoading(false);
       }
     };
 
     fetchProfile();
   }, [navigate, setAuthUser]);
-  
 
   const handleChange = (e) => setProfile({ ...profile, [e.target.name]: e.target.value });
 
-  const handleUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/farmer/profile`, profile, {
         withCredentials: true,
       });
-      alert('Profile updated!');
+      alert(profileCreated ? 'Profile updated!' : 'Profile created!');
+      setProfileCreated(true);
       setEditMode(false);
     } catch (err) {
-      alert('Update failed');
-    } 
+      alert('Something went wrong. Try again.');
+      console.error(err);
+    }
   };
 
   const handleLogout = async () => {
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/logout`, {}, { withCredentials: true });
-      setAuthUser(null); // Clear user context
-      navigate('/'); // Redirect to login page
+      localStorage.removeItem('token');
+      setAuthUser(null);
+      navigate('/');
     } catch (err) {
       console.error(err);
     }
@@ -83,12 +90,10 @@ const FarmerDashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h2 className="dashboard-title">Farmer Dashboard</h2>
-        <button onClick={handleLogout} className="logout-btn">
-          Logout
-        </button>
+        <button onClick={handleLogout} className="logout-btn">Logout</button>
       </div>
 
-      {isProfileComplete && !editMode ? (
+      {!editMode && profileCreated ? (
         <div className="profile-view">
           <p><strong>Name:</strong> {profile.name}</p>
           <p><strong>Zone:</strong> {profile.zone}</p>
@@ -96,16 +101,15 @@ const FarmerDashboard = () => {
           <button onClick={() => setEditMode(true)} className="edit-btn">Edit Profile</button>
           <button onClick={handleSkip} className="skip-btn">Skip</button>
         </div>
-        
-        
       ) : (
-        <form onSubmit={handleUpdate} className="profile-form">
+        <form onSubmit={handleSubmit} className="profile-form">
           <input
             className="form-input"
             name="name"
             value={profile.name}
             onChange={handleChange}
             placeholder="Name"
+            required
           />
           <input
             className="form-input"
@@ -113,6 +117,7 @@ const FarmerDashboard = () => {
             value={profile.zone}
             onChange={handleChange}
             placeholder="Zone"
+            required
           />
           <input
             className="form-input"
@@ -120,8 +125,11 @@ const FarmerDashboard = () => {
             value={profile.area}
             onChange={handleChange}
             placeholder="Area"
+            required
           />
-          <button onClick={handleUpdate} className="submit-btn">{isProfileComplete ? 'Save Changes' : 'Create Profile'}</button>
+          <button type="submit" className="submit-btn">
+            {profileCreated ? 'Save Changes' : 'Create Profile'}
+          </button>
         </form>
       )}
     </div>

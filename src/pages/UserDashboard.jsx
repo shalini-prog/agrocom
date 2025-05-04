@@ -14,16 +14,13 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        
         const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user/profile`, {
           withCredentials: true,
         });
         setProfile(res.data);
-        setLoading(false)
       } catch (err) {
         console.error(err);
-        if (err.response && err.response.status === 401) {
-          
+        if (err.response?.status === 401) {
           setAuthUser(null);
           navigate('/login');
         }
@@ -35,12 +32,14 @@ const UserDashboard = () => {
     fetchProfile();
   }, [navigate, setAuthUser]);
 
-  const handleChange = (e) => setProfile({ ...profile, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setProfile((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token');
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/user/profile`, profile, {
         withCredentials: true,
       });
@@ -73,17 +72,19 @@ const UserDashboard = () => {
   };
 
   if (loading) {
-    return(<div className="loading-container">
-      <div className="spinner"></div>
-      <p>Loading...</p>
-    </div>);
+    return (
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h2 className="dashboard-title">User Dashboard</h2>
-        <button onClick={handleLogout} className="btn logout-btn">Logout</button>
+        <button onClick={handleLogout} className="logout-btn">Logout</button>
       </div>
 
       {isProfileComplete && !editMode ? (
@@ -91,16 +92,36 @@ const UserDashboard = () => {
           <p><strong>Name:</strong> {profile.name}</p>
           <p><strong>Phone:</strong> {profile.phone}</p>
           <p><strong>Date of Birth:</strong> {profile.dob}</p>
-          <button onClick={() => setEditMode(true)} className="btn edit-btn">Edit Profile</button>
+          <button onClick={() => setEditMode(true)} className="edit-btn">Edit Profile</button>
           <button onClick={handleSkip} className="skip-btn">Skip</button>
-
         </div>
       ) : (
         <form onSubmit={handleUpdate} className="profile-form">
-          <input className="input" name="name" value={profile.name} onChange={handleChange} placeholder="Name" />
-          <input className="input" name="phone" value={profile.phone} onChange={handleChange} placeholder="Phone" />
-          <input className="input" type="date" name="dob" value={profile.dob} onChange={handleChange} placeholder="Date of Birth" />
-          <button className="btn save-btn">{isProfileComplete ? 'Save Changes' : 'Create Profile'}</button>
+          <input
+            className="form-input"
+            name="name"
+            value={profile.name}
+            onChange={handleChange}
+            placeholder="Name"
+          />
+          <input
+            className="form-input"
+            name="phone"
+            value={profile.phone}
+            onChange={handleChange}
+            placeholder="Phone"
+          />
+          <input
+            className="form-input"
+            type="date"
+            name="dob"
+            value={profile.dob}
+            onChange={handleChange}
+            placeholder="Date of Birth"
+          />
+          <button type="submit" className="submit-btn">
+            {isProfileComplete ? 'Save Changes' : 'Create Profile'}
+          </button>
         </form>
       )}
     </div>

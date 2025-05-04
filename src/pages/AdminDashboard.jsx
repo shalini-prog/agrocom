@@ -12,8 +12,11 @@ const AdminDashboard = () => {
     phone: '',
     address: '',
   });
+
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(true); // Start in form mode
+  const [profileCreated, setProfileCreated] = useState(false);
+
   const { setAuthUser } = useAuth();
   const navigate = useNavigate();
 
@@ -29,8 +32,12 @@ const AdminDashboard = () => {
           }
         );
 
-        setProfile(res.data);
-        setLoading(false);
+        // If data exists, show the profile instead of the form
+        if (res.data && res.data.empId) {
+          setProfile(res.data);
+          setProfileCreated(true);
+          setEditMode(false);
+        }
       } catch (err) {
         console.error(err);
         if (err.response && err.response.status === 401) {
@@ -49,7 +56,7 @@ const AdminDashboard = () => {
   const handleChange = (e) =>
     setProfile({ ...profile, [e.target.name]: e.target.value });
 
-  const handleUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
@@ -61,11 +68,12 @@ const AdminDashboard = () => {
           withCredentials: true,
         }
       );
-      alert('Profile updated!');
+      alert(editMode ? 'Profile updated!' : 'Profile created!');
+      setProfileCreated(true);
       setEditMode(false);
     } catch (err) {
       console.error(err);
-      alert('Update failed');
+      alert('Something went wrong');
     }
   };
 
@@ -84,17 +92,8 @@ const AdminDashboard = () => {
     }
   };
 
-  const isProfileComplete =
-    profile.empType &&
-    profile.empId &&
-    profile.dept &&
-    profile.phone &&
-    profile.address;
-
-  
-
   const handleSkip = () => {
-    if (isProfileComplete) {
+    if (profileCreated) {
       navigate('/admin/dashboard/main');
     } else {
       alert('Please complete your profile before skipping.');
@@ -114,23 +113,13 @@ const AdminDashboard = () => {
         </button>
       </div>
 
-      {isProfileComplete && !editMode ? (
+      {!editMode && profileCreated ? (
         <div className="profile-view">
-          <p>
-            <strong>Employee Type:</strong> {profile.empType}
-          </p>
-          <p>
-            <strong>Employee ID:</strong> {profile.empId}
-          </p>
-          <p>
-            <strong>Department:</strong> {profile.dept}
-          </p>
-          <p>
-            <strong>Phone:</strong> {profile.phone}
-          </p>
-          <p>
-            <strong>Address:</strong> {profile.address}
-          </p>
+          <p><strong>Employee Type:</strong> {profile.empType}</p>
+          <p><strong>Employee ID:</strong> {profile.empId}</p>
+          <p><strong>Department:</strong> {profile.dept}</p>
+          <p><strong>Phone:</strong> {profile.phone}</p>
+          <p><strong>Address:</strong> {profile.address}</p>
           <button onClick={() => setEditMode(true)} className="btn edit-btn">
             Edit Profile
           </button>
@@ -139,13 +128,14 @@ const AdminDashboard = () => {
           </button>
         </div>
       ) : (
-        <form onSubmit={handleUpdate} className="profile-form">
+        <form className="profile-form" onSubmit={handleSubmit}>
           <input
             className="input"
             name="empType"
             value={profile.empType}
             onChange={handleChange}
             placeholder="Employee Type"
+            required
           />
           <input
             className="input"
@@ -153,6 +143,7 @@ const AdminDashboard = () => {
             value={profile.empId}
             onChange={handleChange}
             placeholder="Employee ID"
+            required
           />
           <input
             className="input"
@@ -160,6 +151,7 @@ const AdminDashboard = () => {
             value={profile.dept}
             onChange={handleChange}
             placeholder="Department"
+            required
           />
           <input
             className="input"
@@ -167,6 +159,7 @@ const AdminDashboard = () => {
             value={profile.phone}
             onChange={handleChange}
             placeholder="Phone"
+            required
           />
           <input
             className="input"
@@ -174,9 +167,10 @@ const AdminDashboard = () => {
             value={profile.address}
             onChange={handleChange}
             placeholder="Address"
+            required
           />
-          <button className="btn save-btn">
-            {isProfileComplete ? 'Save Changes' : 'Create Profile'}
+          <button className="btn save-btn" type="submit">
+            {profileCreated ? 'Save Changes' : 'Create Profile'}
           </button>
         </form>
       )}
@@ -185,4 +179,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-
