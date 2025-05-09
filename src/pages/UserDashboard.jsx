@@ -7,7 +7,9 @@ import './UserDashboard.css';
 const UserDashboard = () => {
   const [profile, setProfile] = useState({ name: '', phone: '', dob: '' });
   const [loading, setLoading] = useState(true);
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(true); // Start in form mode
+  const [profileCreated, setProfileCreated] = useState(false);
+
   const { setAuthUser } = useAuth();
   const navigate = useNavigate();
 
@@ -17,7 +19,12 @@ const UserDashboard = () => {
         const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/auth/user/profile`, {
           withCredentials: true,
         });
-        setProfile(res.data);
+
+        if (res.data && res.data.name) {
+          setProfile(res.data);
+          setProfileCreated(true);
+          setEditMode(false);
+        }
       } catch (err) {
         console.error(err);
         if (err.response?.status === 401) {
@@ -37,17 +44,18 @@ const UserDashboard = () => {
     setProfile((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdate = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/user/profile`, profile, {
         withCredentials: true,
       });
-      alert('Profile updated!');
+      alert(profileCreated ? 'Profile updated!' : 'Profile created!');
+      setProfileCreated(true);
       setEditMode(false);
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.message || 'Update failed');
+      alert('Failed to save profile. Please try again.');
     }
   };
 
@@ -87,7 +95,7 @@ const UserDashboard = () => {
         <button onClick={handleLogout} className="logout-btn">Logout</button>
       </div>
 
-      {isProfileComplete && !editMode ? (
+      {!editMode && profileCreated ? (
         <div className="profile-view">
           <p><strong>Name:</strong> {profile.name}</p>
           <p><strong>Phone:</strong> {profile.phone}</p>
@@ -96,13 +104,14 @@ const UserDashboard = () => {
           <button onClick={handleSkip} className="skip-btn">Skip</button>
         </div>
       ) : (
-        <form onSubmit={handleUpdate} className="profile-form">
+        <form onSubmit={handleSubmit} className="profile-form">
           <input
             className="form-input"
             name="name"
             value={profile.name}
             onChange={handleChange}
             placeholder="Name"
+            required
           />
           <input
             className="form-input"
@@ -110,6 +119,7 @@ const UserDashboard = () => {
             value={profile.phone}
             onChange={handleChange}
             placeholder="Phone"
+            required
           />
           <input
             className="form-input"
@@ -117,10 +127,10 @@ const UserDashboard = () => {
             name="dob"
             value={profile.dob}
             onChange={handleChange}
-            placeholder="Date of Birth"
+            required
           />
           <button type="submit" className="submit-btn">
-            {isProfileComplete ? 'Save Changes' : 'Create Profile'}
+            {profileCreated ? 'Save Changes' : 'Create Profile'}
           </button>
         </form>
       )}
